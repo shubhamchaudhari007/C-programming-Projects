@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include<string.h>
+#include <string.h>
 #include "info.h"
 
 int main()
@@ -20,8 +20,25 @@ int main()
         switch (choice)
         {
         case 1:
-            char pass[20];
-            char AdminPass[20] = "Shubham2003";
+
+            printf("\n----Admin Login----\n");
+            char name[50];
+            int flag;
+            do
+            {
+                flag = 0;
+                printf("Enter a UserName : ");
+                scanf(" %[^\n]", name);
+                char AdminName[20] = "Admin@123";
+
+                if (strcmp(AdminName, name))
+                {
+                    printf("!! INVALID USERNAME \n");
+                    flag = 1;
+                }
+            } while (flag != 0);
+            char pass[50];
+            char AdminPass[20] = "12345";
             printf("Enter a Password to Enter Admin Pannel : ");
             scanf(" %[^\n]", pass);
             if (!strcmp(pass, AdminPass))
@@ -36,7 +53,8 @@ int main()
                     printf("4.Delete product\n");
                     printf("5.Display all Products\n");
                     printf("6.Save Items\n");
-                    printf("7.Exit\n");
+                    printf("7.Bill History\n");
+                    printf("8.Exit\n");
                     printf("Enter Your Choice : ");
                     scanf("%d", &choice1);
 
@@ -66,14 +84,19 @@ int main()
                         break;
 
                     case 7:
+                        billhistory(&products);
+
+                    case 8:
                         break;
 
                     default:
                         printf("Invalid Choice ! Please Enter Valid choice !");
                     }
 
-                } while (choice1 != 7);
-            }else{
+                } while (choice1 != 8);
+            }
+            else
+            {
                 printf("\nInvalid Password\n");
             }
             break;
@@ -87,7 +110,6 @@ int main()
 
         default:
             printf("Invalid Choice! please try again !\n");
-
         }
-    }while(choice != 3);
+    } while (choice != 3);
 }

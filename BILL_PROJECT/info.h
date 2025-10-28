@@ -28,10 +28,13 @@ void displayproducts(Products *products);
 void SearchId(Products *products);
 void SearchName(Products *products);
 void SearchPrice(Products *products);
-void loadcontacts(Products *products);
+void loadproducts(Products *products);
 
 void EditId(Products *products);
 void Editbyname(Products *products);
 void Editprice(Products *products);
+
+int validateid(int id);
+void billhistory(Products *products);
 
 #endif

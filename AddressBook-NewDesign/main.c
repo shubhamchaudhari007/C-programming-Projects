@@ -63,7 +63,7 @@ int main()
         printf("5. List all contacts\n");
         printf("6. Save contacts\n");
         printf("7. Exit\n");
-        printf("Enter your choice (1-7): ");
+        printf("Enter your choice (1-8): ");
         scanf("%d", &choice);
         while(getchar() != '\n');
         switch (choice)
