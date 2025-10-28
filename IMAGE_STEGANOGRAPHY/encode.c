@@ -28,12 +28,12 @@ uint get_image_size_for_bmp(FILE *fptr_image)
     // Read the width (an int)
     fread(&width, sizeof(int), 1, fptr_image);
     /* Informative message about image width */
-    printf("Image width: %u pixels\n", width);
+    //printf("Image width: %u pixels\n", width);
 
     // Read the height (an int)
     fread(&height, sizeof(int), 1, fptr_image);
     /* Informative message about image height */
-    printf("Image height: %u pixels\n", height);
+    //printf("Image height: %u pixels\n", height);
 
     // Return image capacity
     return width * height * 3;
@@ -318,93 +318,115 @@ Status do_encoding(EncodeInfo *encInfo)
        e_success or e_failure. Print user-friendly messages for errors. */
     if (open_files(encInfo) == e_success)
     {
-        /* Files opened successfully for encoding */
-        printf("Files opened successfully.\n");
+        /* Print a friendly header and input/output summary */
+        printf("=============================================\n");
+        printf("🖼️  IMAGE STEGANOGRAPHY USING LSB TECHNIQUE  \n");
+        printf("=============================================\n");
+        printf("\n=============================================\n");
+        printf("🔐 ENCODING MODE SELECTED\n");
+        printf("=============================================\n");
+        printf("📂 Input BMP Image      : %s\n", encInfo->src_image_fname);
+        printf("📄 Secret Message File  : %s\n", encInfo->secret_fname);
+        printf("💾 Output Image (Stego) : %s\n", encInfo->stego_image_fname);
+        printf("---------------------------------------------\n");
         if (check_capacity(encInfo) == e_success)
         {
-            /* Image capacity is sufficient to hold the secret */
-            printf("Image capacity sufficient for embedding.\n");
+            /* Capacity check and basic validation messages */
+            printf("🔍 Checking file access and formats...\n");
+            printf("✅ All files validated successfully!\n");
+            printf("\n⚙️  Encoding Process Started...\n");
+            printf("-------------------------------------------------\n");
             if (copy_bmp_header(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_success)
             {
-                /* BMP header copied to output stego image */
-                printf("BMP header copied to stego image.\n");
+                /* Inform user about header/read phase */
+                printf("📦 Reading source image header...\n");
                 if (encode_magic_string(MAGIC_STRING, encInfo) == e_success)
                 {
-                    /* Magic string embedded to mark presence of secret */
-                    printf("Magic string embedded into image.\n");
+                    /* Inform user we're embedding the magic string / bits */
+                    printf("💡 Embedding secret message bits into pixel data...\n");
                     if (encode_secret_file_extn_size(extn_size, encInfo) == e_success)
                     {
-                        /* Secret file extension length encoded */
-                        printf("Secret file extension size encoded.\n");
+                        /* Extension size encoded */
+                        printf("⏳ Encoding extension metadata...\n");
                         if (encode_secret_file_extn(encInfo->extn_secret_file, encInfo) == e_success)
                         {
-                            /* Secret file extension encoded */
-                            printf("Secret file extension encoded.\n");
+                            /* Extension encoded */
+                            printf("🔐 Extension encoded: %s\n", encInfo->extn_secret_file);
                             if (encode_secret_file_size(encInfo->size_secret_file, encInfo) == e_success)
                             {
-                                /* Secret file size encoded into image */
-                                printf("Secret file size encoded.\n");
+                                /* Secret size encoded */
+                                printf("📦 Secret file size: %ld bytes encoded.\n", encInfo->size_secret_file);
                                 if (encode_secret_file_data(encInfo) == e_success)
                                 {
-                                    /* Secret file data embedded into image LSBs */
-                                    printf("Secret file data encoded into stego image.\n");
+                                    /* Secret data embedded */
+                                    printf("⏳ Please wait, encoding in progress...\n");
                                     if (copy_remaining_img_data(encInfo->fptr_src_image, encInfo->fptr_stego_image) == e_success)
                                     {
-                                        /* Remaining image bytes copied; encoding complete */
-                                        printf("Remaining image data copied. Encoding finished.\n");
+                                        /* Finalize and report success with a friendly block */
+                                        printf("\n🎯 Message successfully embedded into image!\n");
+                                        printf("💾 Stego image created: %s\n", encInfo->stego_image_fname);
+                                        printf("-------------------------------------------------\n");
+                                        printf("✨ Encoding Completed Successfully! ✨\n");
+                                        printf("✅ Your data is now hidden securely inside the image.\n");
+                                        printf("-------------------------------------------------\n\n");
+
+                                        fclose(encInfo->fptr_secret);
+                                        fclose(encInfo->fptr_src_image);
+                                        fclose(encInfo->fptr_stego_image);
+
                                         return e_success;
                                     }
                                     else
                                     {
-                                        printf("Error: failed while copying remaining image data.\n");
+                                        printf("\n⚠️ ERROR: failed while copying remaining image data.\n");
                                         return e_failure;
                                     }
                                 }
                                 else
                                 {
-                                    printf("Error: failed to embed secret data into the image.\n");
+                                    printf("\n⚠️ ERROR: failed to embed secret data into the image.\n");
                                     return e_failure;
                                 }
                             }
                             else
                             {
-                                printf("Error: failed to encode secret file size.\n");
+                                printf("\n⚠️ ERROR: failed to encode secret file size.\n");
                                 return e_failure;
                             }
                         }
                         else
                         {
-                            printf("Error: failed to encode secret file extension.\n");
+                            printf("\n⚠️ ERROR: failed to encode secret file extension.\n");
                             return e_failure;
                         }
                     }
                     else
                     {
-                        printf("Error: failed to encode extension size.\n");
+                        printf("\n⚠️ ERROR: failed to encode extension size.\n");
                         return e_failure;
                     }
                 }
                 else
                 {
-                    printf("Error: failed to encode magic string.\n");
+                    printf("\n⚠️ ERROR: failed to encode magic string.\n");
                     return e_failure;
                 }
             }
             else
             {
-                printf("Error: failed to copy BMP header.\n");
+                printf("\n⚠️ ERROR: failed to read/copy BMP header.\n");
                 return e_failure;
             }
         }
         else
         {
-            printf("Error: image does not have enough capacity for the secret file.\n");
+            printf("\n🚫 Insufficient image capacity: image too small for the secret file.\n");
             return e_failure;
         }
     }
     else
     {
-        printf("Error: unable to open input/output files.\n");
+        printf("\n⚠️ ERROR: unable to open input/output files.\n");
         return e_failure;
     }
 }

@@ -250,47 +250,66 @@ Status decode_size_to_lsb(int *size, char *imageBuffer)
 Status do_decoding(DecodeInfo *dcdInfo)
 {
     /* Run decode steps in sequence and print a user-friendly result */
+    /* Print the same project banner used for encoding so both flows match */
+    
     if (decode_secret_file_extn_size(dcdInfo) == e_success)
     {
-        /* Extension size decoded from image LSBs */
-        printf("Extension size decoded.\n");
+        /* Friendly decode header and progress messages */
         
+        // printf("📂 Input Stego Image : %s\n", dcdInfo->stego1_image_fname);
+        // /* Show intended output base + extension when available */
+        // printf("💾 Output Text File  : %s%s\n", dcdInfo->secret_fname, dcdInfo->extn_secret_file);
+        // printf("---------------------------------------------\n");
+
+        printf("🔍 Validating and reading image data...\n");
+        printf("✅ Image file verified successfully!\n");
+        printf("\n🧩 Extracting hidden bits from image...\n");
+
         if (decode_secret_file_extn(dcdInfo) == e_success)
         {
             /* Secret file extension reconstructed */
-            printf("Secret file extension decoded: %s\n", dcdInfo->extn_secret_file);
+            printf("📜 Reconstructing the hidden message (ext: %s)...\n", dcdInfo->extn_secret_file);
             if (decode_secret_file_size(dcdInfo) == e_success)
             {
                 /* Secret file size decoded */
-                printf("Secret file size decoded: %ld bytes\n", dcdInfo->size_secret_file);
+                printf("⏳ Decoding in progress, please wait... (%ld bytes)\n", dcdInfo->size_secret_file);
 
                 if (decode_secret_file_data(dcdInfo) == e_success)
                 {
-                    printf("Secret file data decoded \n");
-                    printf("Decoding finished\n");
+                    /* Successful decode summary */
+                    printf("\n🎉 Hidden message extracted successfully!\n");
+                    printf("💾 Decoded text saved as: %s\n", dcdInfo->secret_fname);
+                    printf("-------------------------------------------------\n");
+                    printf("✨ Decoding Completed Successfully! ✨\n");
+                    printf("✅ Secret data retrieved without loss.\n");
+                    printf("-------------------------------------------------\n\n");
+
+                    fclose(dcdInfo->fptr_secret);
+                    fclose(dcdInfo->fptr_stego1_image);
+
                     return e_success;
                 }
                 else
                 {
-                    printf("Error: failed to write decoded secret data.\n");
+                    printf("\n⚠️  ERROR: failed to write decoded secret data.\n");
                     return e_failure;
                 }
             }
             else
             {
-                printf("Error: failed to decode secret file size.\n");
+                printf("\n⚠️  ERROR: failed to decode secret file size.\n");
                 return e_failure;
             }
         }
         else
         {
-            printf("Error: failed to decode secret file extension.\n");
+            printf("\n⚠️  ERROR: failed to decode secret file extension.\n");
             return e_failure;
         }
     }
     else
     {
-        printf("Error: failed to decode extension size.\n");
+        printf("\n🚫 ERROR: failed to decode extension size (invalid or corrupted stego image).\n");
         return e_failure;
     }
 }
